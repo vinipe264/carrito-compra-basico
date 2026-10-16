@@ -1,16 +1,16 @@
-# 📄 Documentación Técnica - Proyecto CarritoGT (Migración PHP a Spring Boot)
+# Documentación Técnica - Proyecto CarritoGT (Migración a Spring Boot)
 
 * **Curso:** Programación II
-* **Universidad:** Universidad Mariano Gálvez de Guatemala (UMG)
-* **Estudiante:** Edison Alvarez[cite: 2]
+* **Universidad:** Universidad Mariano Gálvez de Guatemala
+* **Estudiante:** Edison Alvarez
 * **Versión del Documento:** 1.0
 
 ---
 
 ## 1. Evidencia de Virtualización y Recursos
-* **Hipervisor Utilizado:** VirtualBox (Tipo 2)[cite: 14]
-* **Sistema Operativo Invitado:** Lubuntu (GNU/Linux)[cite: 14]
-* **Justificación de Recursos:** Se asignaron 2 GB de RAM y 2 núcleos de CPU para garantizar la estabilidad tanto en el sistema operativo Host (Windows) como en el invitado, permitiendo ejecutar Apache, MariaDB y los servicios de desarrollo simultáneamente sin bloqueos[cite: 14, 17].
+* **Hipervisor Utilizado:** VirtualBox (Tipo 2)
+* **Sistema Operativo Invitado:** Lubuntu (GNU/Linux)
+* **Justificación de Recursos:** Se asignaron 2 GB de RAM y 2 núcleos de CPU para garantizar la estabilidad tanto en el sistema operativo Host (Windows) como en el invitado, permitiendo ejecutar Apache, MariaDB y los servicios de desarrollo simultáneamente sin bloqueos.
 
 ---
 
@@ -24,9 +24,11 @@ graph TD
     Cliente --> C[Ver carrito de compra]
     Cliente --> D[Mostrar artículos]
     Cliente --> E[Pagar carrito de compra]
-    
-    E -.->|"<<include>>"| F[Iniciar sesión]
-    D -.->|"<<extend>>"| G[Filtrar por categoría]
+
+    E .->|<<include>>| F[Iniciar sesión]
+    D .->|<<extend>>| G[Filtrar por categoría]
+---
+
 ## 3. Arquitectura del Sistema (Spring Boot)
 Estructura en capas del microservicio backend en Java Spring Boot:
 
@@ -36,6 +38,12 @@ graph TD
     Controller -->|Inyección de Dependencias| Service[CarritoService]
     Service -->|Operaciones Lógicas| Model[Modelos / Entidades]
     Service -->|Simulación de Datos / DB| Repository[Repositorio de Productos]
+---
+
+## 4. Diagrama Entidad-Relación (Base de Datos)
+Estructura de las tablas y entidades del modelo de carrito de compras:
+
+```mermaid
 erDiagram
     USUARIO ||--o{ CARRITO : posee
     CARRITO ||--|{ DETALLE_CARRITO : contiene
@@ -65,7 +73,12 @@ erDiagram
         int cantidad
         double subtotal
     }
+---
 
+## 5. Diagrama de Secuencia (Agregar al Carrito)
+Flujo de comunicación sincrónica al agregar un producto al carrito:
+
+```mermaid
 sequenceDiagram
     autonumber
     actor Cliente
@@ -80,3 +93,4 @@ sequenceDiagram
     Service->>Service: Calcular Subtotal y Total
     Service-->>Controller: Carrito Actualizado
     Controller-->>Cliente: Respuesta 200 OK (JSON)
+---
