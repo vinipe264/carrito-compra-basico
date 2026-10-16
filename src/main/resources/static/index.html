@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda Virtual - UMG</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        h1, h2 { color: #333; }
+        .container { display: flex; gap: 20px; }
+        .productos, .carrito { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); flex: 1; }
+        button { background: #28a745; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; }
+        button.danger { background: #dc3545; }
+        button:hover { opacity: 0.9; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <h1>Carrito de Compras - Universidad Mariano Gálvez</h1>
+
+    <div class="container">
+        <div class="productos">
+            <h2>Productos Disponibles</h2>
+            <ul id="lista-productos">Cargando productos...</ul>
+        </div>
+
+        <div class="carrito">
+            <h2>Mi Carrito</h2>
+            <ul id="lista-carrito">El carrito está vacío</ul>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        async function cargarProductos() {
+            try {
+                const res = await fetch(`${API_URL}/productos`);
+                const productos = await res.json();
+                const contenedor = document.getElementById('lista-productos');
+                contenedor.innerHTML = '';
+                productos.forEach(p => {
+                    const idProd = p.idProducto !== undefined ? p.idProducto : p.id;
+                    contenedor.innerHTML += `
+                        <li>
+                            <span>${p.nombre} - Q${p.precio}</span>
+                            <button onclick="agregarCarrito(${idProd})">Agregar</button>
+                        </li>`;
+                });
+            } catch (e) { console.error("Error al cargar productos:", e); }
+        }
+
+        async function cargarCarrito() {
+            try {
+                const res = await fetch(`${API_URL}/carrito`);
+                let data = await res.json();
+                
+                // Asegura que sea un arreglo sin importar la estructura de la respuesta
+                const carrito = Array.isArray(data) ? data : (data.items || data.productos || []);
+                
+                const contenedor = document.getElementById('lista-carrito');
+                if (carrito.length === 0) {
+                    contenedor.innerHTML = 'El carrito está vacío';
+                    return;
+                }
+                contenedor.innerHTML = '';
+                carrito.forEach(p => {
+                    const idProd = p.idProducto !== undefined ? p.idProducto : p.id;
+                    contenedor.innerHTML += `
+                        <li>
+                            <span>${p.nombre} - Q${p.precio}</span>
+                            <button class="danger" onclick="eliminarCarrito(${idProd})">Eliminar</button>
+                        </li>`;
+                });
+            } catch (e) { console.error("Error al cargar carrito:", e); }
+        }
+
+        async function agregarCarrito(id) {
+            try {
+                // Probamos las variantes de endpoints más comunes de backend
+                let res = await fetch(`${API_URL}/carrito/${id}`, { method: 'POST' });
+                if (!res.ok) {
+                    res = await fetch(`${API_URL}/carrito/agregar/${id}`, { method: 'POST' });
+                }
+                if (!res.ok) {
+                    res = await fetch(`${API_URL}/carrito?idProducto=${id}`, { method: 'POST' });
+                }
+                cargarCarrito();
+            } catch (e) {
+                console.error("Error al agregar:", e);
+            }
+        }
+
+        async function eliminarCarrito(id) {
+            try {
+                let res = await fetch(`${API_URL}/carrito/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    res = await fetch(`${API_URL}/carrito/eliminar/${id}`, { method: 'DELETE' });
+                }
+                cargarCarrito();
+            } catch (e) {
+                console.error("Error al eliminar:", e);
+            }
+        }
+
+        cargarProductos();
+        cargarCarrito();
+    </script>
+</body>
+</html>
+
