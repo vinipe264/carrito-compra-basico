@@ -27,7 +27,7 @@ graph TD
 
     E .->|<<include>>| F[Iniciar sesión]
     D .->|<<extend>>| G[Filtrar por categoría]
----
+```
 
 ## 3. Arquitectura del Sistema (Spring Boot)
 Estructura en capas del microservicio backend en Java Spring Boot:
@@ -38,7 +38,7 @@ graph TD
     Controller -->|Inyección de Dependencias| Service[CarritoService]
     Service -->|Operaciones Lógicas| Model[Modelos / Entidades]
     Service -->|Simulación de Datos / DB| Repository[Repositorio de Productos]
----
+```
 
 ## 4. Diagrama Entidad-Relación (Base de Datos)
 Estructura de las tablas y entidades del modelo de carrito de compras:
@@ -73,7 +73,7 @@ erDiagram
         int cantidad
         double subtotal
     }
----
+```
 
 ## 5. Diagrama de Secuencia (Agregar al Carrito)
 Flujo de comunicación sincrónica al agregar un producto al carrito:
@@ -93,4 +93,4 @@ sequenceDiagram
     Service->>Service: Calcular Subtotal y Total
     Service-->>Controller: Carrito Actualizado
     Controller-->>Cliente: Respuesta 200 OK (JSON)
----
+```
