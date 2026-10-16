@@ -27,3 +27,56 @@ graph TD
     
     E -.->|"<<include>>"| F[Iniciar sesión]
     D -.->|"<<extend>>"| G[Filtrar por categoría]
+## 3. Arquitectura del Sistema (Spring Boot)
+Estructura en capas del microservicio backend en Java Spring Boot:
+
+```mermaid
+graph TD
+    Client[Cliente / Frontend] -->|HTTP REST / JSON| Controller[CarritoController]
+    Controller -->|Inyección de Dependencias| Service[CarritoService]
+    Service -->|Operaciones Lógicas| Model[Modelos / Entidades]
+    Service -->|Simulación de Datos / DB| Repository[Repositorio de Productos]
+erDiagram
+    USUARIO ||--o{ CARRITO : posee
+    CARRITO ||--|{ DETALLE_CARRITO : contiene
+    PRODUCTO ||--o{ DETALLE_CARRITO : incluye
+    CATEGORIA ||--o{ PRODUCTO : clasifica
+
+    USUARIO {
+        int id PK
+        string nombre
+        string email
+    }
+    PRODUCTO {
+        int id PK
+        string nombre
+        double precio
+        int categoria_id FK
+    }
+    CARRITO {
+        int id PK
+        int usuario_id FK
+        date fecha_creacion
+    }
+    DETALLE_CARRITO {
+        int id PK
+        int carrito_id FK
+        int producto_id FK
+        int cantidad
+        double subtotal
+    }
+
+sequenceDiagram
+    autonumber
+    actor Cliente
+    participant Controller as CarritoController
+    participant Service as CarritoService
+    participant DB as Base de Datos
+
+    Cliente->>Controller: POST /api/carrito/agregar (item)
+    Controller->>Service: agregarProducto(item)
+    Service->>DB: Validar Stock / Buscar Producto
+    DB-->>Service: Producto Confirmado
+    Service->>Service: Calcular Subtotal y Total
+    Service-->>Controller: Carrito Actualizado
+    Controller-->>Cliente: Respuesta 200 OK (JSON)
